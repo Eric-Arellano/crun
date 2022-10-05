@@ -1857,8 +1857,11 @@ uidgidmap_helper (char *helper, pid_t pid, char *map_file, libcrun_error_t *err)
     }
   args[nargs++] = NULL;
 
-  fprintf(stderr, "HERE: %s\n", args);
-  return -1;
+  for (int i = 0; i < nargs; i++) {
+    fprintf(stderr, "arg[%d] = '%s'\n", i, args[i]);
+  }
+
+  return run_process (args, err) ? -1 : 0;
 }
 
 static int
