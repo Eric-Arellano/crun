@@ -1844,6 +1844,9 @@ uidgidmap_helper (char *helper, pid_t pid, char *map_file, libcrun_error_t *err)
   args[nargs++] = helper;
   sprintf (pid_fmt, "%d", pid);
   args[nargs++] = pid_fmt;
+
+  fprintf(stderr, "MAP FILE: %s\n", map_file);
+
   next = map_file;
   while (nargs < MAX_ARGS)
     {
@@ -1855,8 +1858,7 @@ uidgidmap_helper (char *helper, pid_t pid, char *map_file, libcrun_error_t *err)
   args[nargs++] = NULL;
 
   fprintf(stderr, "HERE: %s\n", args);
-
-  return run_process (args, err) ? -1 : 0;
+  return -1;
 }
 
 static int
