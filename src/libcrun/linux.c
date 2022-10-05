@@ -1845,7 +1845,7 @@ uidgidmap_helper (char *helper, pid_t pid, char *map_file, libcrun_error_t *err)
   sprintf (pid_fmt, "%d", pid);
   args[nargs++] = pid_fmt;
 
-  fprintf(stderr, "MAP FILE: %s\n", map_file);
+  fprintf(stderr, "MAP FILE: %s END_MAP_FILE\n", map_file);
 
   next = map_file;
   while (nargs < MAX_ARGS)
