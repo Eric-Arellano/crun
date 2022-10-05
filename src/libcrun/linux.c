@@ -1854,6 +1854,8 @@ uidgidmap_helper (char *helper, pid_t pid, char *map_file, libcrun_error_t *err)
     }
   args[nargs++] = NULL;
 
+  fprintf(stderr, "HERE: %s\n", args);
+
   return run_process (args, err) ? -1 : 0;
 }
 
