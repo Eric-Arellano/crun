@@ -1515,25 +1515,29 @@ run_process_with_stdin_timeout_envp (char *path, char **args, const char *cwd, i
       char *tmp_args[] = { path, NULL };
       int dev_null_fd = -1;
 
-        fprintf (stderr, "BEFORE mark_or_close_fds_ge_than");
+        fprintf (stderr, "BEFORE mark_or_close_fds_ge_than\n");
       ret = mark_or_close_fds_ge_than (3, false, err);
       if (UNLIKELY (ret < 0))
         libcrun_fail_with_error ((*err)->status, "%s", (*err)->msg);
-      fprintf (stderr, "AFTER mark_or_close_fds_ge_than");
+      fprintf (stderr, "AFTER mark_or_close_fds_ge_than\n");
 
       if (out_fd < 0 || err_fd < 0)
         {
+        fprintf (stderr, "INSIDE DEV_NULL BLOCK\n");
           dev_null_fd = open ("/dev/null", O_WRONLY);
           if (UNLIKELY (dev_null_fd < 0))
-            _exit (EXIT_FAILURE);
+            _exit (100);
         }
 
       TEMP_FAILURE_RETRY (close (pipe_w));
       dup2 (pipe_r, 0);
       TEMP_FAILURE_RETRY (close (pipe_r));
+      fprintf (stderr, "AFTER FIRST dup2\n");
 
       dup2 (out_fd >= 0 ? out_fd : dev_null_fd, 1);
+      fprintf (stderr, "AFTER SECOND dup2\n");
       dup2 (err_fd >= 0 ? err_fd : dev_null_fd, 2);
+            fprintf (stderr, "AFTER THIRD dup2\n");
 
       if (dev_null_fd >= 0)
         TEMP_FAILURE_RETRY (close (dev_null_fd));
@@ -1541,6 +1545,8 @@ run_process_with_stdin_timeout_envp (char *path, char **args, const char *cwd, i
         TEMP_FAILURE_RETRY (close (out_fd));
       if (err_fd >= 0)
         TEMP_FAILURE_RETRY (close (err_fd));
+
+      fprintf (stderr, "AFTER CLOSES\n");
 
       if (args == NULL)
         args = tmp_args;
@@ -1550,6 +1556,11 @@ run_process_with_stdin_timeout_envp (char *path, char **args, const char *cwd, i
 
        fprintf (stderr, "BEFORE execvpe");
       execvpe (path, args, envp);
+      int saved_errno = errno;
+        FILE *fp = fopen("/tmp/child-error.txt", "w");
+        fprintf(fp, "%s", path);
+        fprintf(fp, "%s", strerror(saved_errno));
+        fclose(fp);
       perror ("AFTER execvpe");
       _exit (85);
     }
