@@ -716,6 +716,8 @@ do_hooks (runtime_spec_schema_config_schema *def, pid_t pid, const char *id, boo
       if (hooks[i]->env)
         env = hooks[i]->env;
 
+     libcrun_warning ("OUT_FD %d", out_fd);
+     libcrun_warning ("ERR_FD %d", err_fd);
       ret = run_process_with_stdin_timeout_envp (hooks[i]->path, hooks[i]->args, cwd, hooks[i]->timeout, env,
                                                  stdin, stdin_len, out_fd, err_fd, err);
       if (UNLIKELY (ret != 0))
@@ -1408,6 +1410,8 @@ container_init (void *args, char *notify_socket, int sync_socket, libcrun_error_
     {
       libcrun_container_t *container = entrypoint_args->container;
 
+        libcrun_warning ("HOOKS OUT FD %d", entrypoint_args->hooks_out_fd);
+        libcrun_warning ("HOOKS ERR FD %d", entrypoint_args->hooks_err_fd);
       ret = do_hooks (def, 0, container->context->id, false, NULL, "starting", (hook **) def->hooks->start_container,
                       def->hooks->start_container_len, entrypoint_args->hooks_out_fd, entrypoint_args->hooks_err_fd,
                       err);

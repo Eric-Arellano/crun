@@ -1439,9 +1439,13 @@ run_process_with_stdin_timeout_envp (char *path, char **args, const char *cwd, i
   cleanup_close int pipe_w = -1;
   sigset_t mask;
 
+   libcrun_warning ("STARTING run_process_with_stdin_timeout_envp for path %s", path);
+
   ret = pipe (stdin_pipe);
-  if (UNLIKELY (ret < 0))
+  if (UNLIKELY (ret < 0)) {
+    libcrun_warning ("pipe error %d", ret);
     return crun_make_error (err, errno, "pipe");
+  }
   pipe_r = stdin_pipe[0];
   pipe_w = stdin_pipe[1];
 
@@ -1454,8 +1458,11 @@ run_process_with_stdin_timeout_envp (char *path, char **args, const char *cwd, i
     }
 
   pid = fork ();
-  if (UNLIKELY (pid < 0))
+  libcrun_warning ("PID %d", pid);
+  if (UNLIKELY (pid < 0)) {
+    libcrun_warning ("fork error %d", pid);
     return crun_make_error (err, errno, "fork");
+    }
 
   if (pid)
     {
@@ -1508,9 +1515,11 @@ run_process_with_stdin_timeout_envp (char *path, char **args, const char *cwd, i
       char *tmp_args[] = { path, NULL };
       int dev_null_fd = -1;
 
+        fprintf (stderr, "BEFORE mark_or_close_fds_ge_than");
       ret = mark_or_close_fds_ge_than (3, false, err);
       if (UNLIKELY (ret < 0))
         libcrun_fail_with_error ((*err)->status, "%s", (*err)->msg);
+      fprintf (stderr, "AFTER mark_or_close_fds_ge_than");
 
       if (out_fd < 0 || err_fd < 0)
         {
@@ -1537,12 +1546,14 @@ run_process_with_stdin_timeout_envp (char *path, char **args, const char *cwd, i
         args = tmp_args;
 
       if (cwd && chdir (cwd) < 0)
-        _exit (EXIT_FAILURE);
+        _exit (80);
 
+       fprintf (stderr, "BEFORE execvpe");
       execvpe (path, args, envp);
-      _exit (EXIT_FAILURE);
+      perror ("AFTER execvpe");
+      _exit (85);
     }
-  return -1;
+  return -5;
 }
 
 int
