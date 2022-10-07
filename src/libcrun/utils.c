@@ -1547,6 +1547,8 @@ run_process_with_stdin_timeout_envp (char *path, char **args, const char *cwd, i
         TEMP_FAILURE_RETRY (close (err_fd));
 
       fprintf (stderr, "AFTER CLOSES\n");
+      fprintf(stderr, "%s", path);
+       for (int i = 0; i < 4; i++) { fprintf(stderr, "arg[%d] = '%s'\n", i, args[i]); }
 
       if (args == NULL)
         args = tmp_args;
@@ -1554,15 +1556,10 @@ run_process_with_stdin_timeout_envp (char *path, char **args, const char *cwd, i
       if (cwd && chdir (cwd) < 0)
         _exit (80);
 
-       fprintf (stderr, "BEFORE execvpe");
+       fprintf (stderr, "BEFORE execvpe\n");
       execvpe (path, args, envp);
-      int saved_errno = errno;
-        FILE *fp = fopen("/tmp/child-error.txt", "w");
-        fprintf(fp, "%s", path);
-        for (char ** arg = args ; *arg != NULL; arg++) { fprintf(fp, "%s\n", *arg); }
-        fprintf(fp, "%s", strerror(saved_errno));
-        fclose(fp);
-      perror ("AFTER execvpe");
+        perror ("AFTER execvpe\n");
+
       _exit (85);
     }
   return -5;
