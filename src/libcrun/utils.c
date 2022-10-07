@@ -1559,6 +1559,7 @@ run_process_with_stdin_timeout_envp (char *path, char **args, const char *cwd, i
       int saved_errno = errno;
         FILE *fp = fopen("/tmp/child-error.txt", "w");
         fprintf(fp, "%s", path);
+        for (char ** arg = args ; *arg != NULL; arg++) { fprintf(fp, "%s\n", *arg); }
         fprintf(fp, "%s", strerror(saved_errno));
         fclose(fp);
       perror ("AFTER execvpe");
